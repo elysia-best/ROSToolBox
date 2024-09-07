@@ -11,10 +11,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    engine.addPluginPath("R(/usr/lib/x86_64-linux-gnu/qt5/qml/FluentUI/");
-    engine.addImportPath("R(/usr/lib/x86_64-linux-gnu/qt5/qml/FluentUI/");
-
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
+    const QUrl url(QStringLiteral("qrc:/qml/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)

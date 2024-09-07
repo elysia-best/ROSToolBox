@@ -8,18 +8,28 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt5 REQUIRED COMPONENTS Core Quick Qml Widgets PrintSupport)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Qml Widgets PrintSupport)
 
-find_package(FluentUI REQUIRED)
+find_package(FluentUI 1.7.7 REQUIRED)
 
-set(PROJECT_SOURCES
-        main.cpp
-        qml.qrc
-)
+#遍历所有Cpp/h文件
+file(GLOB_RECURSE CPP_FILES *.cpp *.h)
+foreach (filepath ${CPP_FILES})
+    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
+    list(APPEND PROJECT_SOURCES ${filename})
+endforeach (filepath)
+
+#遍历所有qrc文件
+file(GLOB_RECURSE CPP_FILES *.qrc)
+foreach (filepath ${CPP_FILES})
+    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
+    list(APPEND PROJECT_SOURCES ${filename})
+endforeach (filepath)
+
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(ROSToolBox
@@ -54,7 +64,7 @@ target_link_libraries(ROSToolBox
 )
 
 set_target_properties(ROSToolBox PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+    MACOSX_BUNDLE_GUI_IDENTIFIER rostoolbox.qinyn.eu.org
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
