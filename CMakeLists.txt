@@ -11,10 +11,12 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt5 REQUIRED COMPONENTS Core Quick Qml Widgets PrintSupport)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Qml Widgets PrintSupport)
+find_package(QT NAMES Qt5 REQUIRED COMPONENTS Core Quick Qml Widgets PrintSupport LinguistTools)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Quick Qml Widgets PrintSupport LinguistTools)
 
 find_package(FluentUI 1.7.7 REQUIRED)
+
+include_directories(src/inc)
 
 #遍历所有Cpp/h文件
 file(GLOB_RECURSE CPP_FILES *.cpp *.h)
@@ -24,9 +26,16 @@ foreach (filepath ${CPP_FILES})
 endforeach (filepath)
 
 #遍历所有qrc文件
-file(GLOB_RECURSE CPP_FILES *.qrc)
-foreach (filepath ${CPP_FILES})
+file(GLOB_RECURSE QRC_FILES *.qrc)
+foreach (filepath ${QRC_FILES})
     string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
+    list(APPEND PROJECT_SOURCES ${filename})
+endforeach (filepath)
+
+file(GLOB_RECURSE TS_FILES translations/*.ts)
+foreach (filepath ${TS_FILES})
+    string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" filename ${filepath})
+    list(APPEND TS_FILES ${filename})
     list(APPEND PROJECT_SOURCES ${filename})
 endforeach (filepath)
 
@@ -40,6 +49,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 #    set_property(TARGET ROSToolBox APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
     if(ANDROID)
         add_library(ROSToolBox SHARED
@@ -52,7 +62,16 @@ else()
           ${PROJECT_SOURCES}
         )
     endif()
+    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
+
+add_custom_target(translations ALL DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
+
+foreach(_ts_file ${TS_FILES})
+    execute_process(
+        COMMAND ${LUPDATE_EXECUTABLE} -recursive ${CMAKE_SOURCE_DIR} -ts ${_ts_file})
+    execute_process(COMMAND lrelease ${CMAKE_SOURCE_DIR}/${_ts_file})
+endforeach()
 
 target_compile_definitions(ROSToolBox
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
