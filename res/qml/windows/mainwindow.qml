@@ -1,7 +1,13 @@
 import QtQuick 2.15
-import QtQuick.Window 2.2
-import ROSToolBox 1.0
+import QtQuick.Window 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+import QtQml 2.15
+import Qt.labs.platform 1.1
 import FluentUI 1.0
+import ROSToolBox 1.0
+
+import "../global"
 
 FluWindow {
     id: window
@@ -16,9 +22,36 @@ FluWindow {
         height: 30
         showDark: true
         darkClickListener:(button)=>handleDarkChanged(button)
-        closeClickListener: ()=>{Qt.quit();}
+        closeClickListener: ()=>{dialog_close.open();}
         z:7
     }
+
+    Component.onDestruction: {
+        FluRouter.exit()
+    }
+
+//    SystemTrayIcon {
+//        id:system_tray
+//        visible: true
+//        icon.source: "qrc:/image/favicon.ico"
+//        tooltip: "ROSToolBox"
+//        menu: Menu {
+//            MenuItem {
+//                text: "退出"
+//                onTriggered: {
+//                    FluRouter.exit()
+//                }
+//            }
+//        }
+//        onActivated:
+//            (reason)=>{
+//                if(reason === SystemTrayIcon.Trigger){
+//                    window.show()
+//                    window.raise()
+//                    window.requestActivate()
+//                }
+//            }
+//    }
 
 
     Component{
@@ -40,6 +73,23 @@ FluWindow {
     FluLoader{
         id:loader_reveal
         anchors.fill: parent
+    }
+
+    FluContentDialog{
+        id: dialog_close
+        title: qsTr("Quit")
+        message: qsTr("Are you sure you want to exit the program?")
+        negativeText: qsTr("Minimize")
+        buttonFlags: FluContentDialogType.NegativeButton | FluContentDialogType.NeutralButton | FluContentDialogType.PositiveButton
+        onNegativeClicked: {
+//            system_tray.showMessage(qsTr("Friendly Reminder"),qsTr("FluentUI is hidden from the tray, click on the tray to activate the window again"));
+            timer_window_hide_delay.restart()
+        }
+        positiveText: qsTr("Quit")
+        neutralText: qsTr("Cancel")
+        onPositiveClicked:{
+            FluRouter.exit(0)
+        }
     }
 
     function distance(x1,y1,x2,y2){

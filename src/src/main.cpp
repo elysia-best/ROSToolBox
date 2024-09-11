@@ -8,9 +8,6 @@
 #include "helpers/settingshelper.h"
 
 int main(int argc, char *argv[]) {
-  auto uri = "ROSToolBox";
-  int major = 1;
-  int minor = 0;
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -27,11 +24,11 @@ int main(int argc, char *argv[]) {
   QApplication::setApplicationVersion("1.0.0");
   QApplication::setQuitOnLastWindowClosed(false);
 
-  SettingsHelper::getInstance()->init();
-
   QGuiApplication app(argc, argv);
 
-  qmlRegisterType<CircularReveal>(uri, major, minor, "CircularReveal");
+  SettingsHelper::getInstance()->init();
+
+  qmlRegisterType<CircularReveal>("ROSToolBox", 1, 0, "CircularReveal");
 
   QQmlApplicationEngine engine;
 

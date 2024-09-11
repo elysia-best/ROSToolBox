@@ -28,6 +28,7 @@ FluLauncher {
 
     Component.onCompleted: {
         FluApp.init(app, Qt.locale(TranslateHelper.current));
+        FluApp.windowIcon = "qrc:/image/favicon.ico";
         FluApp.useSystemAppBar = SettingsHelper.getBoolData("useSystemAppBar", false);
 
         if (SettingsHelper.getBoolData("darkMode", true)) {
